@@ -68,7 +68,7 @@ const d8_5mTiles = protomapsL.leafletLayer({
     {
       dataLayer: "d8_5m",
       symbolizer: new protomapsL.LineSymbolizer({
-        color: "#1565C0",
+        color: "#29B6F6",
         width: 1.5
       })
     }
