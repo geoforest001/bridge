@@ -883,6 +883,7 @@ document.addEventListener('DOMContentLoaded', () => {
       { id: 'bmStd', label: '地理院標準地図', getLayer: () => gsiStandard,  defVal: 1.0 },
       { id: 'bmAir', label: '地理院航空写真', getLayer: () => gsiAirPhoto,  defVal: 0.0 },
       { id: 'bmCs',  label: '長野県CS立体図', getLayer: () => naganoCsMap,  defVal: 0.0 },
+      { id: 'bmNoto', label: '石川県CS立体図', getLayer: () => ishikawaCsMap, defVal: 0.0 },
     ];
     bmDefs.forEach(({ id, label, getLayer, defVal }) => {
       const item = document.createElement('div');
