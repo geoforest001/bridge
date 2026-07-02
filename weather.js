@@ -879,7 +879,7 @@ document.addEventListener('DOMContentLoaded', () => {
     baseLbl.textContent = 'ベースマップ';
     base.insertBefore(baseLbl, base.firstChild);
 
-    /* 農地レイヤ 見出し */
+    /* 山地レイヤ 見出し */
     const farmLbl = document.createElement('div');
     farmLbl.className = 'lc-section-label';
     farmLbl.textContent = '山地レイヤ';
