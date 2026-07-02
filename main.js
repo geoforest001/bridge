@@ -45,8 +45,8 @@ const moridoTiles = protomapsL.leafletLayer({
     {
       dataLayer: "morido",
       symbolizer: new protomapsL.PolygonSymbolizer({
-        fill: "rgba(255,220,0,0.6)",
-        stroke: "rgb(180,150,0)",
+        fill: "rgba(255,245,60,0.75)",
+        stroke: "rgb(200,170,0)",
         width: 1
       })
     }
