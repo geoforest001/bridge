@@ -36,24 +36,7 @@ const naganoCsMap = L.tileLayer(
 
 gsiStandard.addTo(map);
 
-const MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/morido.pmtiles";
-
-const moridoTiles = protomapsL.leafletLayer({
-  url: MORIDO_URL,
-  maxDataZoom: 15,
-  paintRules: [
-    {
-      dataLayer: "morido",
-      symbolizer: new protomapsL.PolygonSymbolizer({
-        fill: "rgba(210,120,30,0.55)",
-        stroke: "rgb(160,80,10)",
-        width: 1
-      })
-    }
-  ],
-  labelRules: []
-});
-moridoTiles.addTo(map);
+/* 山地レイヤ: データ準備後に追加 */
 
 const baseLayers = {
   "地理院標準地図": gsiStandard,
@@ -62,7 +45,7 @@ const baseLayers = {
 };
 
 const overlays = {
-  "盛り土": moridoTiles
+  /* 山地レイヤ: データ準備後に追加 */
 };
 
 let layerControl;
