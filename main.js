@@ -36,9 +36,7 @@ const naganoCsMap = L.tileLayer(
 
 gsiStandard.addTo(map);
 
-const FARM_POLYGON_URL = "https://geoforest001.github.io/ina_farm_test/data/%E8%BE%B2%E5%9C%B0%E7%AD%86%E3%83%9D%E3%83%AA%E3%82%B4%E3%83%B3.pmtiles";
-
-/* 山地レイヤ: データ準備後に追加予定 */
+/* 山地レイヤ: データ準備後に追加 */
 
 const baseLayers = {
   "地理院標準地図": gsiStandard,
@@ -47,8 +45,7 @@ const baseLayers = {
 };
 
 const overlays = {
-  "農地筆ポリゴン": farmPolygonTiles,
-  /* 山地レイヤをここに追加予定 */
+  /* 山地レイヤ: データ準備後に追加 */
 };
 
 let layerControl;
