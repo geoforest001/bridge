@@ -36,9 +36,19 @@ const naganoCsMap = L.tileLayer(
   }
 );
 
+const ishikawaCsMap = L.tileLayer(
+  "https://www2.ffpri.go.jp/soilmap/tile/cs_noto/{z}/{x}/{y}.png",
+  {
+    attribution: '森林総合研究所 石川県CS立体図',
+    maxZoom: 18,
+    className: "bm-multiply"
+  }
+);
+
 gsiStandard.addTo(map);
 gsiAirPhoto.addTo(map); gsiAirPhoto.setOpacity(0);
 naganoCsMap.addTo(map); naganoCsMap.setOpacity(0);
+ishikawaCsMap.addTo(map); ishikawaCsMap.setOpacity(0);
 
 const MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/morido.pmtiles";
 
