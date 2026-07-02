@@ -69,6 +69,25 @@ const moridoTiles = protomapsL.leafletLayer({
 });
 moridoTiles.addTo(map);
 
+const NOTO_MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/noto_morido.pmtiles";
+
+const notoMoridoTiles = protomapsL.leafletLayer({
+  url: NOTO_MORIDO_URL,
+  maxDataZoom: 16,
+  paintRules: [
+    {
+      dataLayer: "noto_morido",
+      symbolizer: new protomapsL.PolygonSymbolizer({
+        fill: "rgba(255,245,60,0.75)",
+        stroke: "rgb(200,170,0)",
+        width: 1
+      })
+    }
+  ],
+  labelRules: []
+});
+notoMoridoTiles.addTo(map);
+
 const D8_5M_URL = "https://geoforest001.github.io/bridge_data/data/d8_5m.pmtiles";
 
 const d8_5mTiles = protomapsL.leafletLayer({
@@ -91,6 +110,7 @@ const baseLayers = {};
 
 const overlays = {
   "伊那谷盛り土": moridoTiles,
+  "能登盛り土": notoMoridoTiles,
   "流向ライン5m": d8_5mTiles
 };
 
