@@ -924,10 +924,10 @@ document.addEventListener('DOMContentLoaded', () => {
     bmSep.className = 'leaflet-control-layers-separator';
     base.appendChild(bmSep);
 
-    /* 農地レイヤ 見出し */
+    /* 山地レイヤ 見出し */
     const farmLbl = document.createElement('div');
     farmLbl.className = 'lc-section-label';
-    farmLbl.textContent = '農地レイヤ';
+    farmLbl.textContent = '山地レイヤ';
     overlays.insertBefore(farmLbl, overlays.firstChild);
 
     /* 気象レイヤ セクション */
