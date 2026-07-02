@@ -59,10 +59,29 @@ const moridoTiles = protomapsL.leafletLayer({
 });
 moridoTiles.addTo(map);
 
+const D8_5M_URL = "https://geoforest001.github.io/bridge_data/data/d8_5m.pmtiles";
+
+const d8_5mTiles = protomapsL.leafletLayer({
+  url: D8_5M_URL,
+  maxDataZoom: 16,
+  paintRules: [
+    {
+      dataLayer: "d8_5m",
+      symbolizer: new protomapsL.LineSymbolizer({
+        color: "#1565C0",
+        width: 1.5
+      })
+    }
+  ],
+  labelRules: []
+});
+d8_5mTiles.addTo(map);
+
 const baseLayers = {};
 
 const overlays = {
-  "伊那谷盛り土": moridoTiles
+  "伊那谷盛り土": moridoTiles,
+  "流向ライン5m": d8_5mTiles
 };
 
 let layerControl;
