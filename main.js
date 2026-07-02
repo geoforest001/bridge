@@ -35,6 +35,8 @@ const naganoCsMap = L.tileLayer(
 );
 
 gsiStandard.addTo(map);
+gsiAirPhoto.addTo(map); gsiAirPhoto.setOpacity(0);
+naganoCsMap.addTo(map); naganoCsMap.setOpacity(0);
 
 const MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/morido.pmtiles";
 
@@ -55,11 +57,7 @@ const moridoTiles = protomapsL.leafletLayer({
 });
 moridoTiles.addTo(map);
 
-const baseLayers = {
-  "地理院標準地図": gsiStandard,
-  "地理院航空写真": gsiAirPhoto,
-  "長野県CS立体図": naganoCsMap
-};
+const baseLayers = {};
 
 const overlays = {
   "伊那谷盛り土": moridoTiles
