@@ -880,11 +880,11 @@ document.addEventListener('DOMContentLoaded', () => {
     base.insertBefore(baseLbl, base.firstChild);
 
     const bmDefs = [
-      { id: 'bmStd', label: '地理院標準地図', varName: 'gsiStandard',  defVal: 1.0 },
-      { id: 'bmAir', label: '地理院航空写真', varName: 'gsiAirPhoto',  defVal: 0.0 },
-      { id: 'bmCs',  label: '長野県CS立体図', varName: 'naganoCsMap',  defVal: 0.0 },
+      { id: 'bmStd', label: '地理院標準地図', getLayer: () => gsiStandard,  defVal: 1.0 },
+      { id: 'bmAir', label: '地理院航空写真', getLayer: () => gsiAirPhoto,  defVal: 0.0 },
+      { id: 'bmCs',  label: '長野県CS立体図', getLayer: () => naganoCsMap,  defVal: 0.0 },
     ];
-    bmDefs.forEach(({ id, label, varName, defVal }) => {
+    bmDefs.forEach(({ id, label, getLayer, defVal }) => {
       const item = document.createElement('div');
       item.className = 'bm-item';
       item.innerHTML = `
@@ -903,7 +903,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const pct    = document.getElementById(id + 'Pct');
 
       function applyOpacity(val) {
-        const lyr = window[varName];
+        const lyr = getLayer();
         if (!lyr) return;
         lyr.setOpacity(val);
         pct.textContent = Math.round(val * 100) + '%';
@@ -924,10 +924,10 @@ document.addEventListener('DOMContentLoaded', () => {
     bmSep.className = 'leaflet-control-layers-separator';
     base.appendChild(bmSep);
 
-    /* 山地レイヤ 見出し */
+    /* 農地レイヤ 見出し */
     const farmLbl = document.createElement('div');
     farmLbl.className = 'lc-section-label';
-    farmLbl.textContent = '山地レイヤ';
+    farmLbl.textContent = '農地レイヤ';
     overlays.insertBefore(farmLbl, overlays.firstChild);
 
     /* 気象レイヤ セクション */
