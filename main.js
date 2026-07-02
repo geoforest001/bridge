@@ -44,7 +44,7 @@ const MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/morido.pmtil
 
 const moridoTiles = protomapsL.leafletLayer({
   url: MORIDO_URL,
-  maxDataZoom: 15,
+  maxDataZoom: 16,
   paintRules: [
     {
       dataLayer: "morido",
