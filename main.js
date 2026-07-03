@@ -54,6 +54,7 @@ const MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/morido.pmtil
 
 const moridoTiles = protomapsL.leafletLayer({
   url: MORIDO_URL,
+  attribution: '© ジオ・フォレスト',
   maxDataZoom: 16,
   paintRules: [
     {
@@ -73,6 +74,7 @@ const NOTO_MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/noto_mo
 
 const notoMoridoTiles = protomapsL.leafletLayer({
   url: NOTO_MORIDO_URL,
+  attribution: '© ジオ・フォレスト',
   maxDataZoom: 16,
   paintRules: [
     {
@@ -92,6 +94,7 @@ const D8_5M_URL = "https://geoforest001.github.io/bridge_data/data/d8_5m.pmtiles
 
 const d8_5mTiles = protomapsL.leafletLayer({
   url: D8_5M_URL,
+  attribution: '© ジオ・フォレスト',
   maxDataZoom: 16,
   paintRules: [
     {
