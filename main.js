@@ -70,6 +70,17 @@ const moridoTiles = protomapsL.leafletLayer({
 });
 moridoTiles.addTo(map);
 
+/* attribution: OSMを除去してジオ・フォレストに統一 */
+map.on('layeradd layerremove', () => {
+  const ctrl = map.attributionControl;
+  if (ctrl) {
+    const el = ctrl.getContainer();
+    if (el) el.innerHTML = el.innerHTML
+      .replace(/©?\s*<a[^>]*openstreetmap[^>]*>OpenStreetMap<\/a>\s*(contributors)?[,\s]*/gi, '')
+      .replace(/©?\s*<a[^>]*protomaps[^>]*>Protomaps<\/a>\s*[,\s]*/gi, '');
+  }
+});
+
 const NOTO_MORIDO_URL = "https://geoforest001.github.io/bridge_data/data/noto_morido.pmtiles";
 
 const notoMoridoTiles = protomapsL.leafletLayer({
