@@ -221,5 +221,20 @@ function renderLayerControl() {
 
 renderLayerControl();
 
+/* ─── スケール・ズームレベル ─────────────────── */
+L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
+
+const ZoomDisplay = L.Control.extend({
+  options: { position: 'bottomleft' },
+  onAdd(m) {
+    const el = L.DomUtil.create('div', 'zoom-display');
+    const update = () => { el.textContent = `Z ${m.getZoom()}`; };
+    update();
+    m.on('zoomend', update);
+    return el;
+  }
+});
+new ZoomDisplay().addTo(map);
+
 /* ─── 現在地ボタン ─────────────────────────────── */
   let currentLocationMarker = null;
