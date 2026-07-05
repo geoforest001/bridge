@@ -243,17 +243,18 @@ map.on('click', function(e) {
   drawHighlight(e, picked.feature && picked.feature.geom);
 
   var p = (picked.feature || picked).props || {};
-  function fmt(v) {
-    if (!v || /^0+$/.test(v)) return null;
-    return v.replace(/^0+(\d)/, '$1'); // 先頭ゼロを除去
-  }
   var rows = [
-    ['林班',  fmt(p.RIN)],
-    ['小班',  fmt(p.SHO)],
-    ['施業班', fmt(p.SEGYO)],
-    ['枝番',  fmt(p.EDA)],
-    ['承認',  fmt(p.SHONIN)]
-  ].filter(function(r) { return r[1]; });
+    ['林班',  p.RIN],
+    ['小班',  p.SHO],
+    ['施業班', p.SEGYO],
+    ['枝番',  p.EDA],
+    ['承認',  p.SHONIN]
+  ].filter(function(r) {
+    var v = String(r[1] != null ? r[1] : '');
+    return v !== '' && !/^0+$/.test(v);
+  }).map(function(r) {
+    return [r[0], String(r[1]).replace(/^0+(\d)/, '$1')];
+  });
   L.popup().setLatLng(e.latlng).setContent(
     '<b>施業班情報</b><br>' +
     rows.map(function(r) { return r[0] + ': ' + r[1]; }).join('<br>')
@@ -308,4 +309,5 @@ new ZoomDisplay().addTo(map);
 
 /* ─── 現在地ボタン ─────────────────────────────── */
   let currentLocationMarker = null;
+
 
