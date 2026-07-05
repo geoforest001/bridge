@@ -176,54 +176,79 @@ const segyohanTiles = protomapsL.leafletLayer({
   labelRules: []
 });
 
-/* 施業班クリックで属性ポップアップ */
-map.on('click', function(e) {
-  if (!map.hasLayer(segyohanTiles)) return;
-  if (map.getZoom() < 11) return;
+/* ─── 施業班ハイライト + ポップアップ ─────────── */
+var segyoHighlight = L.layerGroup().addTo(map);
 
-  var lng = e.latlng.lng, lat = e.latlng.lat, zoom = map.getZoom();
+function querySegyohan(lng, lat, zoom) {
   var picked = null;
-
-  // 方法1: queryTileFeaturesDebug (ESM公開API)
   if (typeof segyohanTiles.queryTileFeaturesDebug === 'function') {
-    var r1 = segyohanTiles.queryTileFeaturesDebug(lng, lat, 16);
-    if (r1 instanceof Map) {
-      r1.forEach(function(feats) {
-        if (!picked && feats && feats.length) picked = feats[0];
-      });
-    }
+    var r = segyohanTiles.queryTileFeaturesDebug(lng, lat, 16);
+    if (r instanceof Map) r.forEach(function(f) { if (!picked && f && f.length) picked = f[0]; });
   }
-
-  // 方法2: views → view.queryFeatures (内部API)
   if (!picked && segyohanTiles.views) {
     segyohanTiles.views.forEach(function(view) {
-      if (picked) return;
-      if (typeof view.queryFeatures === 'function') {
-        var feats = view.queryFeatures(lng, lat, zoom, 16);
-        if (feats && feats.length) picked = feats[0];
-      }
+      if (picked || typeof view.queryFeatures !== 'function') return;
+      var f = view.queryFeatures(lng, lat, zoom, 16);
+      if (f && f.length) picked = f[0];
     });
   }
+  return picked;
+}
 
-  if (!picked) {
-    console.log('[施業班] click miss. zoom=' + zoom +
-      ' queryTileFeaturesDebug=' + typeof segyohanTiles.queryTileFeaturesDebug +
-      ' views=' + typeof segyohanTiles.views +
-      ' keys=' + Object.keys(segyohanTiles).slice(0,20).join(','));
-    return;
+function drawHighlight(e, geom) {
+  segyoHighlight.clearLayers();
+  if (!geom || !geom.length) return;
+
+  var zoom  = map.getZoom();
+  var scale = Math.pow(2, zoom);
+  var ts    = segyohanTiles.tileSize || (256 * (window.devicePixelRatio || 1));
+  var lng = e.latlng.lng, lat = e.latlng.lat;
+
+  // クリック点 → タイル座標
+  var mx = (lng + 180) / 360;
+  var my = 0.5 - Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) / (2 * Math.PI);
+  var tx = Math.floor(mx * scale);
+  var ty = Math.floor(my * scale);
+
+  // タイルピクセル → WGS84
+  function px2ll(px, py) {
+    var mx2 = (tx + px / ts) / scale;
+    var my2 = (ty + py / ts) / scale;
+    return [Math.atan(Math.sinh(Math.PI * (1 - 2 * my2))) * 180 / Math.PI, mx2 * 360 - 180];
   }
 
-  var p = (picked.feature || picked).props || picked.feature || {};
-  console.log('[施業班] picked:', picked, 'props:', p);
+  var rings = [];
+  for (var ri = 0; ri < geom.length; ri++) {
+    var ring = geom[ri], pts = [];
+    for (var i = 0; i < ring.length; i += 2) pts.push(px2ll(ring[i], ring[i + 1]));
+    if (pts.length >= 3) rings.push(pts);
+  }
+  if (rings.length) {
+    L.polygon(rings, { color: '#FF6600', weight: 2.5, fillColor: '#FF8800', fillOpacity: 0.35, interactive: false }).addTo(segyoHighlight);
+  }
+}
 
-  var html = '<b>施業班情報</b><br>' +
-    '林班: ' + (p.RIN || '--') + '<br>' +
-    '小班: ' + (p.SHO || '--') + '<br>' +
+map.on('click', function(e) {
+  segyoHighlight.clearLayers();
+  if (!map.hasLayer(segyohanTiles) || map.getZoom() < 11) return;
+
+  var picked = querySegyohan(e.latlng.lng, e.latlng.lat, map.getZoom());
+  if (!picked) return;
+
+  drawHighlight(e, picked.feature && picked.feature.geom);
+
+  var p = (picked.feature || picked).props || {};
+  L.popup().setLatLng(e.latlng).setContent(
+    '<b>施業班情報</b><br>' +
+    '林班: '  + (p.RIN   || '--') + '<br>' +
+    '小班: '  + (p.SHO   || '--') + '<br>' +
     '施業班: ' + (p.SEGYO || '--') + '<br>' +
-    '枝番: ' + (p.EDA || '--') + '<br>' +
-    '承認: ' + (p.SHONIN || '--');
-  L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
+    '枝番: '  + (p.EDA   || '--') + '<br>' +
+    '承認: '  + (p.SHONIN|| '--')
+  ).openOn(map);
 });
+
+map.on('popupclose', function() { segyoHighlight.clearLayers(); });
 
 const baseLayers = {};
 
