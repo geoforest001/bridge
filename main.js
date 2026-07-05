@@ -120,12 +120,88 @@ const d8_5mTiles = protomapsL.leafletLayer({
 });
 d8_5mTiles.addTo(map);
 
+/* ─── 森林計画図（上伊那地域）─────────────────── */
+const RINPAN_URL   = "https://geoforest001.github.io/bridge_data/data/rinpan.pmtiles";
+const SHOHAN_URL   = "https://geoforest001.github.io/bridge_data/data/shohan.pmtiles";
+const SEGYOHAN_URL = "https://geoforest001.github.io/bridge_data/data/segyohan.pmtiles";
+
+const rinpanTiles = protomapsL.leafletLayer({
+  url: RINPAN_URL,
+  attribution: '© 林野庁',
+  maxDataZoom: 14,
+  paintRules: [
+    {
+      dataLayer: "rinpan",
+      symbolizer: new protomapsL.PolygonSymbolizer({
+        fill: "rgba(0,0,0,0)",
+        opacity: 0,
+        stroke: "#2E7D32",
+        width: 2.5
+      })
+    }
+  ],
+  labelRules: []
+});
+
+const shohanTiles = protomapsL.leafletLayer({
+  url: SHOHAN_URL,
+  attribution: '© 林野庁',
+  maxDataZoom: 14,
+  paintRules: [
+    {
+      dataLayer: "shohan",
+      symbolizer: new protomapsL.PolygonSymbolizer({
+        fill: "rgba(0,0,0,0)",
+        opacity: 0,
+        stroke: "#1565C0",
+        width: 1.5
+      })
+    }
+  ],
+  labelRules: []
+});
+
+const segyohanTiles = protomapsL.leafletLayer({
+  url: SEGYOHAN_URL,
+  attribution: '© 林野庁',
+  maxDataZoom: 14,
+  paintRules: [
+    {
+      dataLayer: "segyohan",
+      symbolizer: new protomapsL.PolygonSymbolizer({
+        fill: "rgba(180,0,0,0.04)",
+        opacity: 0.04,
+        stroke: "#C62828",
+        width: 0.8
+      })
+    }
+  ],
+  labelRules: []
+});
+
+/* 施業班クリックで属性ポップアップ */
+segyohanTiles.on('click', function(e) {
+  if (!e.features || e.features.length === 0) return;
+  const p = e.features[0].props;
+  const html =
+    '<b>施業班情報</b><br>' +
+    `林班: ${p.RIN || '--'}<br>` +
+    `小班: ${p.SHO || '--'}<br>` +
+    `施業班: ${p.SEGYO || '--'}<br>` +
+    `枝番: ${p.EDA || '--'}<br>` +
+    `承認: ${p.SHONIN || '--'}`;
+  L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
+});
+
 const baseLayers = {};
 
 const overlays = {
   "伊那谷盛り土": moridoTiles,
   "能登盛り土": notoMoridoTiles,
-  "流向ライン5m": d8_5mTiles
+  "流向ライン5m": d8_5mTiles,
+  "林班（上伊那）": rinpanTiles,
+  "小班（上伊那）": shohanTiles,
+  "施業班（上伊那）": segyohanTiles
 };
 
 let layerControl;
