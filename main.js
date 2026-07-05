@@ -201,7 +201,7 @@ function drawHighlight(e, geom) {
 
   var zoom  = map.getZoom();
   var scale = Math.pow(2, zoom);
-  var ts    = segyohanTiles.tileSize || 256;
+  var ts    = (segyohanTiles.tileSize || 256) * (window.devicePixelRatio || 1);
   var lng = e.latlng.lng, lat = e.latlng.lat;
 
   var mx = (lng + 180) / 360;
@@ -243,13 +243,20 @@ map.on('click', function(e) {
   drawHighlight(e, picked.feature && picked.feature.geom);
 
   var p = (picked.feature || picked).props || {};
+  function fmt(v) {
+    if (!v || /^0+$/.test(v)) return null;
+    return v.replace(/^0+(\d)/, '$1'); // 先頭ゼロを除去
+  }
+  var rows = [
+    ['林班',  fmt(p.RIN)],
+    ['小班',  fmt(p.SHO)],
+    ['施業班', fmt(p.SEGYO)],
+    ['枝番',  fmt(p.EDA)],
+    ['承認',  fmt(p.SHONIN)]
+  ].filter(function(r) { return r[1]; });
   L.popup().setLatLng(e.latlng).setContent(
     '<b>施業班情報</b><br>' +
-    '林班: '  + (p.RIN   || '--') + '<br>' +
-    '小班: '  + (p.SHO   || '--') + '<br>' +
-    '施業班: ' + (p.SEGYO || '--') + '<br>' +
-    '枝番: '  + (p.EDA   || '--') + '<br>' +
-    '承認: '  + (p.SHONIN|| '--')
+    rows.map(function(r) { return r[0] + ': ' + r[1]; }).join('<br>')
   ).openOn(map);
 });
 
