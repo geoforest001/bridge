@@ -278,23 +278,45 @@ map.on('popupclose', function() { segyoHighlight.clearLayers(); });
 
 /* ─── 施業区域内立木（15m以上）─────────────────── */
 var TACHIKI_SP_COLOR = {
-  'アカマツ': '#E53935',
-  'カラマツ': '#FB8C00',
-  'スギ':     '#43A047',
-  'ヒノキ':   '#1E88E5'
+  'アカマツ': '#F00E0E',
+  'カラマツ': '#30E63B',
+  'スギ':     '#1509F3',
+  'ヒノキ':   '#33A02C'
 };
+
+// 高さ(m)→半径px: scale_polynomial(H, 10, 35, 0.1, 1, 0.57) を4段階で近似
+var TACHIKI_H_BINS = [
+  [30, 7.5],
+  [25, 5.5],
+  [20, 4.0],
+  [15, 2.8]
+];
+
+(function() {
+  var rules = [];
+  Object.entries(TACHIKI_SP_COLOR).forEach(function(sp_color) {
+    var sp = sp_color[0], fill = sp_color[1];
+    TACHIKI_H_BINS.forEach(function(bin) {
+      var hMin = bin[0], r = bin[1];
+      rules.push({
+        dataLayer: "tachiki",
+        filter: function(hMin) {
+          return function(z, f) { return f.props.SP === sp && f.props.H >= hMin; };
+        }(hMin),
+        symbolizer: new protomapsL.CircleSymbolizer({
+          radius: r, fill: fill, stroke: '#fff', width: 0.8, opacity: 0.85
+        })
+      });
+    });
+  });
+  window._tachikiPaintRules = rules;
+})();
 
 var tachikiTiles = protomapsL.leafletLayer({
   url: "https://geoforest001.github.io/bridge_data/data/tachiki.pmtiles",
   attribution: '© ジオ・フォレスト',
   maxDataZoom: 17,
-  paintRules: Object.entries(TACHIKI_SP_COLOR).map(function(e) {
-    return {
-      dataLayer: "tachiki",
-      filter: function(z, f) { return f.props.SP === e[0]; },
-      symbolizer: new protomapsL.CircleSymbolizer({ radius: 4, fill: e[1], stroke: '#fff', width: 0.8, opacity: 0.85 })
-    };
-  }),
+  paintRules: window._tachikiPaintRules,
   labelRules: []
 });
 
