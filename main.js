@@ -236,6 +236,16 @@ function drawHighlight(e, geom) {
   }
 }
 
+var IROHA = {
+  A:'い', B:'ろ', C:'は', D:'に', E:'ほ', F:'へ', G:'と', H:'ち', I:'り',
+  J:'ぬ', K:'る', L:'を', M:'わ', N:'か', O:'よ', P:'た', Q:'れ', R:'そ',
+  S:'つ', T:'ね', U:'な', V:'ら', W:'む', X:'う', Y:'ゐ', Z:'の'
+};
+function shoLabel(v) {
+  var s = String(v).trim().toUpperCase();
+  return IROHA[s] || v;
+}
+
 map.on('click', function(e) {
   segyoHighlight.clearLayers();
   if (!map.hasLayer(segyohanTiles) || map.getZoom() < 11) return;
@@ -248,7 +258,7 @@ map.on('click', function(e) {
   var p = (picked.feature || picked).props || {};
   var rows = [
     ['林班',  p.RIN],
-    ['小班',  p.SHO],
+    ['小班',  shoLabel(p.SHO)],
     ['施業班', p.SEGYO],
     ['枝番',  p.EDA],
     ['承認',  p.SHONIN]
