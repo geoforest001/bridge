@@ -133,8 +133,7 @@ const rinpanTiles = protomapsL.leafletLayer({
     {
       dataLayer: "rinpan",
       symbolizer: new protomapsL.PolygonSymbolizer({
-        fill: "rgba(0,0,0,0)",
-        opacity: 0,
+        fill: "rgba(46,125,50,0.08)",
         stroke: "#2E7D32",
         width: 2.5
       })
@@ -151,8 +150,7 @@ const shohanTiles = protomapsL.leafletLayer({
     {
       dataLayer: "shohan",
       symbolizer: new protomapsL.PolygonSymbolizer({
-        fill: "rgba(0,0,0,0)",
-        opacity: 0,
+        fill: "rgba(21,101,192,0.06)",
         stroke: "#1565C0",
         width: 1.5
       })
@@ -169,8 +167,7 @@ const segyohanTiles = protomapsL.leafletLayer({
     {
       dataLayer: "segyohan",
       symbolizer: new protomapsL.PolygonSymbolizer({
-        fill: "rgba(180,0,0,0.04)",
-        opacity: 0.04,
+        fill: "rgba(198,40,40,0.05)",
         stroke: "#C62828",
         width: 0.8
       })
@@ -226,9 +223,10 @@ L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo
 
 const ZoomDisplay = L.Control.extend({
   options: { position: 'bottomleft' },
-  onAdd(m) {
-    const el = L.DomUtil.create('div', 'zoom-display');
-    const update = () => { el.textContent = `Z ${m.getZoom()}`; };
+  onAdd: function(m) {
+    const el = L.DomUtil.create('div', 'leaflet-control zoom-display');
+    el.style.cssText = 'padding:3px 8px;background:rgba(255,255,255,0.9);border:2px solid rgba(0,0,0,0.2);border-radius:4px;font-size:13px;font-weight:700;color:#333;line-height:1.5;pointer-events:none;';
+    const update = function() { el.textContent = 'Z ' + m.getZoom(); };
     update();
     m.on('zoomend', update);
     return el;
