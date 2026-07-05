@@ -199,19 +199,22 @@ function drawHighlight(e, geom) {
   segyoHighlight.clearLayers();
   if (!geom || !geom.length) return;
 
-  var zoom  = map.getZoom();
-  var scale = Math.pow(2, zoom);
-  var ts    = (segyohanTiles.tileSize || 256) * (window.devicePixelRatio || 1);
-  var lng = e.latlng.lng, lat = e.latlng.lat;
+  // protomapsはlevelDiff=1デフォルト: データタイルはdisplayZoom-1
+  // TileCache.tileSize = 256 * 2^levelDiff = 512
+  var displayZoom = map.getZoom();
+  var dataZoom  = Math.min(Math.round(displayZoom) - 1, 14);
+  var dataScale = Math.pow(2, dataZoom);
+  var ts = 512;  // 256 << levelDiff(1)
 
+  var lng = e.latlng.lng, lat = e.latlng.lat;
   var mx = (lng + 180) / 360;
   var my = 0.5 - Math.log(Math.tan(Math.PI / 4 + lat * Math.PI / 360)) / (2 * Math.PI);
-  var tx = Math.floor(mx * scale);
-  var ty = Math.floor(my * scale);
+  var tx = Math.floor(mx * dataScale);
+  var ty = Math.floor(my * dataScale);
 
   function px2ll(px, py) {
-    var mx2 = (tx + px / ts) / scale;
-    var my2 = (ty + py / ts) / scale;
+    var mx2 = (tx + px / ts) / dataScale;
+    var my2 = (ty + py / ts) / dataScale;
     return [Math.atan(Math.sinh(Math.PI * (1 - 2 * my2))) * 180 / Math.PI, mx2 * 360 - 180];
   }
 
@@ -309,5 +312,6 @@ new ZoomDisplay().addTo(map);
 
 /* ─── 現在地ボタン ─────────────────────────────── */
   let currentLocationMarker = null;
+
 
 
