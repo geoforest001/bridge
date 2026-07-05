@@ -177,16 +177,20 @@ const segyohanTiles = protomapsL.leafletLayer({
 });
 
 /* 施業班クリックで属性ポップアップ */
-segyohanTiles.on('click', function(e) {
-  if (!e.features || e.features.length === 0) return;
-  const p = e.features[0].props;
+map.on('click', function(e) {
+  if (!map.hasLayer(segyohanTiles)) return;
+  if (map.getZoom() < 11) return;
+  const results = segyohanTiles.queryTileFeaturesDebug(e.latlng.lng, e.latlng.lat, 5);
+  const features = results && results.get('segyohan');
+  if (!features || features.length === 0) return;
+  const p = features[0].feature.props;
   const html =
     '<b>施業班情報</b><br>' +
-    `林班: ${p.RIN || '--'}<br>` +
-    `小班: ${p.SHO || '--'}<br>` +
-    `施業班: ${p.SEGYO || '--'}<br>` +
-    `枝番: ${p.EDA || '--'}<br>` +
-    `承認: ${p.SHONIN || '--'}`;
+    '林班: ' + (p.RIN || '--') + '<br>' +
+    '小班: ' + (p.SHO || '--') + '<br>' +
+    '施業班: ' + (p.SEGYO || '--') + '<br>' +
+    '枝番: ' + (p.EDA || '--') + '<br>' +
+    '承認: ' + (p.SHONIN || '--');
   L.popup().setLatLng(e.latlng).setContent(html).openOn(map);
 });
 
