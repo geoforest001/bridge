@@ -197,23 +197,11 @@ function querySegyohan(lng, lat, zoom) {
 
 function drawHighlight(e, geom) {
   segyoHighlight.clearLayers();
-  if (!geom || !geom.length) {
-    console.log('[HL] geom null or empty');
-    return;
-  }
-
-  var ring0 = geom[0];
-  var isTyped = ArrayBuffer.isView(ring0);
-  var vals = isTyped ? Array.from(ring0).slice(0, 8) : (Array.isArray(ring0) ? ring0.slice(0, 4) : [ring0]);
-  console.log('[HL] geom.length=' + geom.length +
-    ' ring0 type=' + (isTyped ? ring0.constructor.name : typeof ring0) +
-    ' ring0.length=' + (ring0 && ring0.length) +
-    ' first values=' + JSON.stringify(vals) +
-    ' tileSize=' + (segyohanTiles.tileSize));
+  if (!geom || !geom.length) return;
 
   var zoom  = map.getZoom();
   var scale = Math.pow(2, zoom);
-  var ts    = segyohanTiles.tileSize || (256 * (window.devicePixelRatio || 1));
+  var ts    = segyohanTiles.tileSize || 256;
   var lng = e.latlng.lng, lat = e.latlng.lat;
 
   var mx = (lng + 180) / 360;
@@ -230,16 +218,18 @@ function drawHighlight(e, geom) {
   var rings = [];
   for (var ri = 0; ri < geom.length; ri++) {
     var ring = geom[ri], pts = [];
-    if (isTyped || Array.isArray(ring)) {
-      for (var i = 0; i < ring.length; i += 2) pts.push(px2ll(ring[i], ring[i + 1]));
-    } else if (ring && typeof ring.x !== 'undefined') {
-      pts.push(px2ll(ring.x, ring.y));
+    for (var i = 0; i < ring.length; i++) {
+      var pt = ring[i];
+      pts.push(px2ll(pt.x, pt.y));
     }
     if (pts.length >= 3) rings.push(pts);
   }
-  console.log('[HL] rings=' + rings.length + ' pts0=' + (rings[0] && rings[0].length) + ' sample=' + JSON.stringify(rings[0] && rings[0][0]));
   if (rings.length) {
-    L.polygon(rings, { color: '#FF6600', weight: 2.5, fillColor: '#FF8800', fillOpacity: 0.35, interactive: false }).addTo(segyoHighlight);
+    L.polygon(rings, {
+      color: '#FF6600', weight: 2.5,
+      fillColor: '#FF8800', fillOpacity: 0.35,
+      interactive: false
+    }).addTo(segyoHighlight);
   }
 }
 
@@ -311,3 +301,4 @@ new ZoomDisplay().addTo(map);
 
 /* ─── 現在地ボタン ─────────────────────────────── */
   let currentLocationMarker = null;
+
