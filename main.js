@@ -248,20 +248,43 @@ function shoLabel(v) {
 
 map.on('click', function(e) {
   segyoHighlight.clearLayers();
-  if (!map.hasLayer(segyohanTiles) || map.getZoom() < 11) return;
+  var zoom = map.getZoom();
 
-  var picked = querySegyohan(e.latlng.lng, e.latlng.lat, map.getZoom());
+  // 立木クリック判定（施業班より優先）
+  if (map.hasLayer(tachikiTiles) && zoom >= 13) {
+    var pt = null;
+    if (tachikiTiles.views) {
+      tachikiTiles.views.forEach(function(view) {
+        if (pt || typeof view.queryFeatures !== 'function') return;
+        var r = view.queryFeatures(e.latlng.lng, e.latlng.lat, zoom, 17);
+        if (r && r.length) pt = r[0];
+      });
+    }
+    if (pt) {
+      var p = (pt.feature || pt).props || {};
+      if (p.SP) {
+        L.popup().setLatLng(e.latlng).setContent(
+          '<b>立木情報</b><br>樹種: ' + p.SP + '<br>樹高: ' + p.H + 'm'
+        ).openOn(map);
+        return;
+      }
+    }
+  }
+
+  // 施業班クリック判定
+  if (!map.hasLayer(segyohanTiles) || zoom < 11) return;
+  var picked = querySegyohan(e.latlng.lng, e.latlng.lat, zoom);
   if (!picked) return;
 
   drawHighlight(e, picked.feature && picked.feature.geom);
 
-  var p = (picked.feature || picked).props || {};
+  var p2 = (picked.feature || picked).props || {};
   var rows = [
-    ['林班',  p.RIN],
-    ['小班',  shoLabel(p.SHO)],
-    ['施業班', p.SEGYO],
-    ['枝番',  p.EDA],
-    ['樹種',  p.JUSHU]
+    ['林班',  p2.RIN],
+    ['小班',  shoLabel(p2.SHO)],
+    ['施業班', p2.SEGYO],
+    ['枝番',  p2.EDA],
+    ['樹種',  p2.JUSHU]
   ].filter(function(r) {
     var v = String(r[1] != null ? r[1] : '');
     return v !== '' && !/^0+$/.test(v);
@@ -318,25 +341,6 @@ var tachikiTiles = protomapsL.leafletLayer({
   maxDataZoom: 17,
   paintRules: window._tachikiPaintRules,
   labelRules: []
-});
-
-map.on('click', function(e) {
-  if (!map.hasLayer(tachikiTiles) || map.getZoom() < 13) return;
-  if (map.hasLayer(segyohanTiles)) return;  // 施業班クリックを優先
-  var pt = null;
-  if (tachikiTiles.views) {
-    tachikiTiles.views.forEach(function(view) {
-      if (pt || typeof view.queryFeatures !== 'function') return;
-      var r = view.queryFeatures(e.latlng.lng, e.latlng.lat, map.getZoom(), 17);
-      if (r && r.length) pt = r[0];
-    });
-  }
-  if (!pt) return;
-  var p = (pt.feature || pt).props || {};
-  if (!p.SP) return;
-  L.popup().setLatLng(e.latlng).setContent(
-    '<b>立木情報</b><br>樹種: ' + p.SP + '<br>樹高: ' + p.H + 'm'
-  ).openOn(map);
 });
 
 const baseLayers = {};
