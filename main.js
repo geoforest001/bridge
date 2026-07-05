@@ -261,7 +261,7 @@ map.on('click', function(e) {
     ['小班',  shoLabel(p.SHO)],
     ['施業班', p.SEGYO],
     ['枝番',  p.EDA],
-    ['承認',  p.SHONIN]
+    ['樹種',  p.JUSHU]
   ].filter(function(r) {
     var v = String(r[1] != null ? r[1] : '');
     return v !== '' && !/^0+$/.test(v);
