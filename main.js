@@ -327,7 +327,7 @@ var TACHIKI_H_BINS = [
           return function(z, f) { return f.props.SP === sp && f.props.H >= hMin; };
         }(hMin),
         symbolizer: new protomapsL.CircleSymbolizer({
-          radius: r, fill: fill, stroke: '#fff', width: 0.8, opacity: 0.85
+          radius: r, fill: fill, stroke: '#333', width: 0.4, opacity: 0.9
         })
       });
     });
