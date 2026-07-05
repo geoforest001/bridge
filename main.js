@@ -180,12 +180,43 @@ const segyohanTiles = protomapsL.leafletLayer({
 map.on('click', function(e) {
   if (!map.hasLayer(segyohanTiles)) return;
   if (map.getZoom() < 11) return;
-  const results = segyohanTiles.queryTileFeaturesDebug(e.latlng.lng, e.latlng.lat, 5);
-  const features = results && results.get('segyohan');
-  if (!features || features.length === 0) return;
-  const p = features[0].feature.props;
-  const html =
-    '<b>施業班情報</b><br>' +
+
+  var lng = e.latlng.lng, lat = e.latlng.lat, zoom = map.getZoom();
+  var picked = null;
+
+  // 方法1: queryTileFeaturesDebug (ESM公開API)
+  if (typeof segyohanTiles.queryTileFeaturesDebug === 'function') {
+    var r1 = segyohanTiles.queryTileFeaturesDebug(lng, lat, 16);
+    if (r1 instanceof Map) {
+      r1.forEach(function(feats) {
+        if (!picked && feats && feats.length) picked = feats[0];
+      });
+    }
+  }
+
+  // 方法2: views → view.queryFeatures (内部API)
+  if (!picked && segyohanTiles.views) {
+    segyohanTiles.views.forEach(function(view) {
+      if (picked) return;
+      if (typeof view.queryFeatures === 'function') {
+        var feats = view.queryFeatures(lng, lat, zoom, 16);
+        if (feats && feats.length) picked = feats[0];
+      }
+    });
+  }
+
+  if (!picked) {
+    console.log('[施業班] click miss. zoom=' + zoom +
+      ' queryTileFeaturesDebug=' + typeof segyohanTiles.queryTileFeaturesDebug +
+      ' views=' + typeof segyohanTiles.views +
+      ' keys=' + Object.keys(segyohanTiles).slice(0,20).join(','));
+    return;
+  }
+
+  var p = (picked.feature || picked).props || picked.feature || {};
+  console.log('[施業班] picked:', picked, 'props:', p);
+
+  var html = '<b>施業班情報</b><br>' +
     '林班: ' + (p.RIN || '--') + '<br>' +
     '小班: ' + (p.SHO || '--') + '<br>' +
     '施業班: ' + (p.SEGYO || '--') + '<br>' +
