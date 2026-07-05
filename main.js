@@ -276,6 +276,47 @@ map.on('click', function(e) {
 
 map.on('popupclose', function() { segyoHighlight.clearLayers(); });
 
+/* ─── 施業区域内立木（15m以上）─────────────────── */
+var TACHIKI_SP_COLOR = {
+  'アカマツ': '#E53935',
+  'カラマツ': '#FB8C00',
+  'スギ':     '#43A047',
+  'ヒノキ':   '#1E88E5'
+};
+
+var tachikiTiles = protomapsL.leafletLayer({
+  url: "https://geoforest001.github.io/bridge_data/data/tachiki.pmtiles",
+  attribution: '© ジオ・フォレスト',
+  maxDataZoom: 17,
+  paintRules: Object.entries(TACHIKI_SP_COLOR).map(function(e) {
+    return {
+      dataLayer: "tachiki",
+      filter: function(z, f) { return f.props.SP === e[0]; },
+      symbolizer: new protomapsL.CircleSymbolizer({ radius: 4, fill: e[1], stroke: '#fff', width: 0.8, opacity: 0.85 })
+    };
+  }),
+  labelRules: []
+});
+
+map.on('click', function(e) {
+  if (!map.hasLayer(tachikiTiles) || map.getZoom() < 13) return;
+  if (map.hasLayer(segyohanTiles)) return;  // 施業班クリックを優先
+  var pt = null;
+  if (tachikiTiles.views) {
+    tachikiTiles.views.forEach(function(view) {
+      if (pt || typeof view.queryFeatures !== 'function') return;
+      var r = view.queryFeatures(e.latlng.lng, e.latlng.lat, map.getZoom(), 17);
+      if (r && r.length) pt = r[0];
+    });
+  }
+  if (!pt) return;
+  var p = (pt.feature || pt).props || {};
+  if (!p.SP) return;
+  L.popup().setLatLng(e.latlng).setContent(
+    '<b>立木情報</b><br>樹種: ' + p.SP + '<br>樹高: ' + p.H + 'm'
+  ).openOn(map);
+});
+
 const baseLayers = {};
 
 const overlays = {
@@ -284,7 +325,8 @@ const overlays = {
   "流向ライン5m": d8_5mTiles,
   "林班（上伊那）": rinpanTiles,
   "小班（上伊那）": shohanTiles,
-  "施業班（上伊那）": segyohanTiles
+  "施業班（上伊那）": segyohanTiles,
+  "施業区域内立木": tachikiTiles
 };
 
 let layerControl;
