@@ -504,18 +504,31 @@ function renderLayerControl() {
   });
   layerControl.addTo(map);
 
-  // 山地レイヤ（林班〜保安林）だけ2列化: 先頭3件と末尾1件は除外
+  // 山地レイヤを明示的2列に配置
+  // 左列: 林班[3], 小班[4], 保安林[13]
+  // 右列: 施業班[5]〜その他針[12], 施業区域内立木[14]
   var sec = document.querySelector('.leaflet-control-layers-overlays');
   if (!sec) return;
   var labels = Array.from(sec.querySelectorAll('label'));
-  var startIdx = 3;
-  var endIdx = labels.length - 2;
-  if (endIdx > startIdx) {
-    var wrap = document.createElement('div');
-    wrap.className = 'lc-mountain-cols';
-    sec.insertBefore(wrap, labels[startIdx]);
-    for (var i = startIdx; i <= endIdx; i++) wrap.appendChild(labels[i]);
-  }
+  if (labels.length < 15) return;
+
+  var grid = document.createElement('div');
+  grid.className = 'lc-mountain-cols';
+  var col1 = document.createElement('div');
+  col1.className = 'lc-col';
+  var col2 = document.createElement('div');
+  col2.className = 'lc-col';
+  grid.appendChild(col1);
+  grid.appendChild(col2);
+  sec.insertBefore(grid, labels[3]);
+
+  col1.appendChild(labels[3]);   // 林班
+  col1.appendChild(labels[4]);   // 小班
+  col1.appendChild(labels[13]);  // 保安林
+
+  col2.appendChild(labels[5]);   // 施業班
+  for (var i = 6; i <= 12; i++) col2.appendChild(labels[i]);  // └サブ7種
+  col2.appendChild(labels[14]);  // 施業区域内立木
 }
 
 renderLayerControl();
