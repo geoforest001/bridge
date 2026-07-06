@@ -303,7 +303,7 @@ map.on('popupclose', function() { segyoHighlight.clearLayers(); });
 /* ─── 施業区域内立木（15m以上）─────────────────── */
 var TACHIKI_SP_COLOR = {
   'アカマツ': '#F00E0E',
-  'カラマツ': '#30E63B',
+  'カラマツ': '#6BA825',
   'スギ':     '#1509F3',
   'ヒノキ':   '#33A02C'
 };
