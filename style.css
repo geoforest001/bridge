@@ -530,13 +530,13 @@ body {
 }
 
 
-/* ===== レイヤーコントロール 2列表示 ===== */
-.leaflet-control-layers-overlays {
+/* ===== 山地レイヤのみ2列表示 ===== */
+.lc-mountain-cols {
   columns: 2;
   column-gap: 10px;
   min-width: 260px;
 }
-.leaflet-control-layers-overlays label {
+.lc-mountain-cols label {
   break-inside: avoid;
   display: block;
   white-space: nowrap;
