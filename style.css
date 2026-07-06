@@ -532,12 +532,16 @@ body {
 
 /* ===== 山地レイヤのみ2列表示 ===== */
 .lc-mountain-cols {
-  columns: 2;
-  column-gap: 10px;
-  min-width: 260px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+  align-items: start;
+}
+.lc-col {
+  display: flex;
+  flex-direction: column;
 }
 .lc-mountain-cols label {
-  break-inside: avoid;
-  display: block;
   white-space: nowrap;
+  display: block;
 }
