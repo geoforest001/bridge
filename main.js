@@ -344,6 +344,101 @@ var tachikiTiles = protomapsL.leafletLayer({
   labelRules: []
 });
 
+/* ─── 施業班 樹種別カラーレイヤー ──────────────── */
+function HatchPolygonSymbolizer(opts) {
+  this.fill        = opts.fill        || 'rgba(0,0,0,0)';
+  this.stroke      = opts.stroke;
+  this.strokeWidth = opts.strokeWidth || 0.6;
+  this.hatchColor  = opts.hatchColor;
+  this.hatchSpacing = opts.hatchSpacing || 7;
+}
+HatchPolygonSymbolizer.prototype.draw = function(ctx, geom) {
+  if (!geom || !geom.length) return;
+  ctx.beginPath();
+  for (var ri = 0; ri < geom.length; ri++) {
+    var ring = geom[ri];
+    if (!ring.length) continue;
+    ctx.moveTo(ring[0].x, ring[0].y);
+    for (var i = 1; i < ring.length; i++) ctx.lineTo(ring[i].x, ring[i].y);
+    ctx.closePath();
+  }
+  ctx.fillStyle = this.fill;
+  ctx.fill();
+  if (this.hatchColor) {
+    ctx.save();
+    ctx.clip();
+    ctx.strokeStyle = this.hatchColor;
+    ctx.lineWidth = 1.2;
+    var minX=Infinity, minY=Infinity, maxX=-Infinity, maxY=-Infinity;
+    for (var ri = 0; ri < geom.length; ri++) {
+      for (var i = 0; i < geom[ri].length; i++) {
+        var pt = geom[ri][i];
+        if (pt.x < minX) minX = pt.x; if (pt.y < minY) minY = pt.y;
+        if (pt.x > maxX) maxX = pt.x; if (pt.y > maxY) maxY = pt.y;
+      }
+    }
+    var sp = this.hatchSpacing, h = maxY - minY + 1, w = maxX - minX;
+    ctx.beginPath();
+    for (var d = -h; d < w + h; d += sp) {
+      ctx.moveTo(minX + d, minY);
+      ctx.lineTo(minX + d + h, maxY);
+    }
+    ctx.stroke();
+    ctx.restore();
+  }
+  if (this.stroke) {
+    ctx.strokeStyle = this.stroke;
+    ctx.lineWidth = this.strokeWidth;
+    ctx.beginPath();
+    for (var ri = 0; ri < geom.length; ri++) {
+      var ring = geom[ri];
+      if (!ring.length) continue;
+      ctx.moveTo(ring[0].x, ring[0].y);
+      for (var i = 1; i < ring.length; i++) ctx.lineTo(ring[i].x, ring[i].y);
+      ctx.closePath();
+    }
+    ctx.stroke();
+  }
+};
+
+var SP_DEFS = [
+  { key:'アカマツ',      fill:'rgba(220,0,0,0.5)',      stroke:'#DD0000',  match:['アカマツ'] },
+  { key:'カラマツ',      fill:'rgba(80,200,0,0.5)',     stroke:'#50C800',  match:['カラマツ'] },
+  { key:'スギ',          fill:'rgba(0,100,255,0.5)',    stroke:'#0064FF',  match:['スギ'] },
+  { key:'ヒノキ・サワラ', fill:'rgba(0,110,45,0.5)',    stroke:'#006E2D',  match:['ヒノキ','サワラ'] },
+  { key:'ナラ類',        fill:'rgba(255,140,0,0.5)',    stroke:'#FF8C00',  match:['ナラ類','クヌギ','ブナ'] },
+  { key:'その他広葉樹',  fill:'rgba(255,200,100,0.12)', stroke:'#CC7000',
+    hatch:'rgba(255,140,0,0.7)', match:['その他広'] },
+  { key:'その他針',      fill:'rgba(100,150,255,0.12)', stroke:'#0050CC',
+    hatch:'rgba(0,100,255,0.7)',  match:['その他針'] },
+];
+
+var spLayers = {};
+SP_DEFS.forEach(function(def) {
+  var sym = def.hatch
+    ? new HatchPolygonSymbolizer({
+        fill: def.fill, stroke: def.stroke, strokeWidth: 0.6,
+        hatchColor: def.hatch, hatchSpacing: 7
+      })
+    : new protomapsL.PolygonSymbolizer({ fill: def.fill, stroke: def.stroke, width: 0.6 });
+  spLayers[def.key] = protomapsL.leafletLayer({
+    url: SEGYOHAN_URL,
+    attribution: '© 林野庁',
+    maxDataZoom: 14,
+    paintRules: [{
+      dataLayer: "segyohan",
+      filter: (function(match) {
+        return function(z, f) {
+          var dom = (f.props.JUSHU || '').split('・')[0];
+          return match.indexOf(dom) !== -1;
+        };
+      })(def.match),
+      symbolizer: sym
+    }],
+    labelRules: []
+  });
+});
+
 const baseLayers = {};
 
 const overlays = {
@@ -353,6 +448,13 @@ const overlays = {
   "林班（上伊那）": rinpanTiles,
   "小班（上伊那）": shohanTiles,
   "施業班（上伊那）": segyohanTiles,
+  "　└ アカマツ": spLayers['アカマツ'],
+  "　└ カラマツ": spLayers['カラマツ'],
+  "　└ スギ": spLayers['スギ'],
+  "　└ ヒノキ・サワラ": spLayers['ヒノキ・サワラ'],
+  "　└ ナラ類": spLayers['ナラ類'],
+  "　└ その他広葉樹": spLayers['その他広葉樹'],
+  "　└ その他針": spLayers['その他針'],
   "施業区域内立木": tachikiTiles
 };
 
