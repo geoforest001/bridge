@@ -136,7 +136,7 @@ const rinpanTiles = protomapsL.leafletLayer({
       symbolizer: new protomapsL.PolygonSymbolizer({
         fill: "rgba(46,125,50,0.08)",
         stroke: "#2E7D32",
-        width: 2.5
+        width: 3.5
       })
     }
   ],
@@ -170,7 +170,7 @@ const segyohanTiles = protomapsL.leafletLayer({
       symbolizer: new protomapsL.PolygonSymbolizer({
         fill: "rgba(198,40,40,0.05)",
         stroke: "#C62828",
-        width: 0.8
+        width: 0.6
       })
     }
   ],
