@@ -496,16 +496,26 @@ const overlays = {
 let layerControl;
 
 function renderLayerControl() {
-  if (layerControl) {
-    map.removeControl(layerControl);
-  }
+  if (layerControl) map.removeControl(layerControl);
 
   layerControl = L.control.layers(baseLayers, overlays, {
     position: "topright",
     collapsed: false
   });
-
   layerControl.addTo(map);
+
+  // 山地レイヤ（林班〜保安林）だけ2列化: 先頭3件と末尾1件は除外
+  var sec = document.querySelector('.leaflet-control-layers-overlays');
+  if (!sec) return;
+  var labels = Array.from(sec.querySelectorAll('label'));
+  var startIdx = 3;
+  var endIdx = labels.length - 2;
+  if (endIdx > startIdx) {
+    var wrap = document.createElement('div');
+    wrap.className = 'lc-mountain-cols';
+    sec.insertBefore(wrap, labels[startIdx]);
+    for (var i = startIdx; i <= endIdx; i++) wrap.appendChild(labels[i]);
+  }
 }
 
 renderLayerControl();
