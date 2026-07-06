@@ -524,10 +524,10 @@ function renderLayerControl() {
 
   col1.appendChild(labels[3]);   // 林班
   col1.appendChild(labels[4]);   // 小班
-  col1.appendChild(labels[13]);  // 保安林
 
   col2.appendChild(labels[5]);   // 施業班
   for (var i = 6; i <= 12; i++) col2.appendChild(labels[i]);  // └サブ7種
+  col2.appendChild(labels[13]);  // 保安林
   col2.appendChild(labels[14]);  // 施業区域内立木
 }
 
