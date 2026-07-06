@@ -439,6 +439,40 @@ SP_DEFS.forEach(function(def) {
   });
 });
 
+/* ─── 保安林レイヤー ─────────────────────────── */
+// 1つのレイヤーに全種別をまとめて色分け表示
+var horinLayer = protomapsL.leafletLayer({
+  url: SEGYOHAN_URL,
+  attribution: '© 林野庁',
+  maxDataZoom: 14,
+  paintRules: [
+    {
+      dataLayer: "segyohan",
+      filter: function(z, f) { var h=(f.props.HORIN||'').split('・')[0]; return h==='水かん'; },
+      symbolizer: new protomapsL.PolygonSymbolizer({ fill:'rgba(0,180,240,0.45)', stroke:'#0099CC', width:0.7 })
+    },
+    {
+      dataLayer: "segyohan",
+      filter: function(z, f) { var h=(f.props.HORIN||'').split('・')[0]; return h==='土流'||h==='土崩'||h==='土保'; },
+      symbolizer: new protomapsL.PolygonSymbolizer({ fill:'rgba(150,90,30,0.45)', stroke:'#8B5A1E', width:0.7 })
+    },
+    {
+      dataLayer: "segyohan",
+      filter: function(z, f) { var h=(f.props.HORIN||'').split('・')[0]; return h==='保健'; },
+      symbolizer: new protomapsL.PolygonSymbolizer({ fill:'rgba(0,160,80,0.45)', stroke:'#009950', width:0.7 })
+    },
+    {
+      dataLayer: "segyohan",
+      filter: function(z, f) {
+        var h=(f.props.HORIN||'').split('・')[0];
+        return h!=='' && ['水かん','土流','土崩','土保','保健'].indexOf(h)===-1;
+      },
+      symbolizer: new protomapsL.PolygonSymbolizer({ fill:'rgba(140,0,200,0.45)', stroke:'#8000BB', width:0.7 })
+    }
+  ],
+  labelRules: []
+});
+
 const baseLayers = {};
 
 const overlays = {
@@ -455,6 +489,7 @@ const overlays = {
   "　└ ナラ類": spLayers['ナラ類'],
   "　└ その他広葉樹": spLayers['その他広葉樹'],
   "　└ その他針": spLayers['その他針'],
+  "保安林（上伊那）": horinLayer,
   "施業区域内立木": tachikiTiles
 };
 
